@@ -58,7 +58,9 @@ def forgeModules = [
     [moduleName: 'v26_1', minecraftVersion: '26.1', forgeVersion: '26.1-62.0.9', javaVersion: 25, sourceTemplate: 'v26_1', loaderTemplate: 'forge/template', compileRelease: 25],
     [moduleName: 'v26_1_1', minecraftVersion: '26.1.1', forgeVersion: '26.1.1-63.0.2', javaVersion: 25, sourceTemplate: 'v26_1', loaderTemplate: 'forge/template', compileRelease: 25],
     [moduleName: 'v26_1_2', minecraftVersion: '26.1.2', forgeVersion: '26.1.2-64.0.11', javaVersion: 25, sourceTemplate: 'v26_1', loaderTemplate: 'forge/template', compileRelease: 25],
-    [moduleName: 'v26_2', minecraftVersion: '26.2', forgeVersion: '26.2-65.0.1', javaVersion: 25, sourceTemplate: 'v26_1', loaderTemplate: 'forge/template', compileRelease: 25]
+    // 26.2 的“开放局域网”界面已从 ShareToLanScreen 改为 MultiplayerOptionsScreen，
+    // 不能复用 v26_1 兼容模板。
+    [moduleName: 'v26_2', minecraftVersion: '26.2', forgeVersion: '26.2-65.0.1', javaVersion: 25, sourceTemplate: 'v26_2', loaderTemplate: 'forge/template', compileRelease: 25]
 ].collect { spec ->
     spec.projectPath = ":forge:${spec.moduleName}"
     spec.forgeVersionRange = forgeMajorVersionRange(spec.forgeVersion)
