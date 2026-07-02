@@ -1,0 +1,281 @@
+plugins {
+    id 'base'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '7.0.31' apply false
+}
+
+group = property('maven_group')
+version = property('mod_version')
+
+def neoLinkApiVersion = property('neolinkapi_version')
+def neoLinkMcCommonVersion = property('neolinkmc_common_version')
+def neoLinkMcCommonCoordinate = "top.ceroxe.neolinkmc:neolinkmc-common:${neoLinkMcCommonVersion}"
+def jetbrainsAnnotationsVersion = '26.0.2'
+def requestedTasks = gradle.startParameter.taskNames
+def diagnosticRootTasks = [
+    'help',
+    'tasks',
+    'projects',
+    'properties',
+    'dependencies',
+    'dependencyInsight',
+    'components',
+    'model',
+    'wrapper'
+] as Set
+def isDiagnosticOnlyRequest = !requestedTasks.isEmpty() && requestedTasks.every { taskName ->
+    !taskName.contains(':') && diagnosticRootTasks.contains(taskName)
+}
+
+def forgeModules = [
+    [moduleName: 'v1_20', minecraftVersion: '1.20', forgeVersion: '1.20-46.0.14', javaVersion: 17, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 17],
+    [moduleName: 'v1_20_1', minecraftVersion: '1.20.1', forgeVersion: '1.20.1-47.4.20', javaVersion: 17, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 17],
+    [moduleName: 'v1_20_2', minecraftVersion: '1.20.2', forgeVersion: '1.20.2-48.1.0', javaVersion: 17, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 17],
+    [moduleName: 'v1_20_3', minecraftVersion: '1.20.3', forgeVersion: '1.20.3-49.0.2', javaVersion: 17, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 17],
+    [moduleName: 'v1_20_4', minecraftVersion: '1.20.4', forgeVersion: '1.20.4-49.2.7', javaVersion: 17, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 17],
+    [moduleName: 'v1_20_6', minecraftVersion: '1.20.6', forgeVersion: '1.20.6-50.2.8', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 21],
+    [moduleName: 'v1_21', minecraftVersion: '1.21', forgeVersion: '1.21-51.0.33', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 21],
+    [moduleName: 'v1_21_1', minecraftVersion: '1.21.1', forgeVersion: '1.21.1-52.1.14', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 21],
+    [moduleName: 'v1_21_3', minecraftVersion: '1.21.3', forgeVersion: '1.21.3-53.1.10', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 21],
+    [moduleName: 'v1_21_4', minecraftVersion: '1.21.4', forgeVersion: '1.21.4-54.1.16', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 21],
+    [moduleName: 'v1_21_5', minecraftVersion: '1.21.5', forgeVersion: '1.21.5-55.1.10', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template_legacy', compileRelease: 21],
+    [moduleName: 'v1_21_6', minecraftVersion: '1.21.6', forgeVersion: '1.21.6-56.0.9', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template', compileRelease: 21],
+    [moduleName: 'v1_21_7', minecraftVersion: '1.21.7', forgeVersion: '1.21.7-57.0.3', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template', compileRelease: 21],
+    [moduleName: 'v1_21_8', minecraftVersion: '1.21.8', forgeVersion: '1.21.8-58.1.18', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template', compileRelease: 21],
+    [moduleName: 'v1_21_9', minecraftVersion: '1.21.9', forgeVersion: '1.21.9-59.0.5', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template', compileRelease: 21],
+    [moduleName: 'v1_21_10', minecraftVersion: '1.21.10', forgeVersion: '1.21.10-60.1.9', javaVersion: 21, sourceTemplate: 'v1_21_8', loaderTemplate: 'forge/template', compileRelease: 21],
+    [moduleName: 'v26_1', minecraftVersion: '26.1', forgeVersion: '26.1-62.0.9', javaVersion: 25, sourceTemplate: 'v26_1', loaderTemplate: 'forge/template', compileRelease: 25],
+    [moduleName: 'v26_1_1', minecraftVersion: '26.1.1', forgeVersion: '26.1.1-63.0.2', javaVersion: 25, sourceTemplate: 'v26_1', loaderTemplate: 'forge/template', compileRelease: 25],
+    [moduleName: 'v26_1_2', minecraftVersion: '26.1.2', forgeVersion: '26.1.2-64.0.11', javaVersion: 25, sourceTemplate: 'v26_1', loaderTemplate: 'forge/template', compileRelease: 25],
+    [moduleName: 'v26_2', minecraftVersion: '26.2', forgeVersion: '26.2-65.0.1', javaVersion: 25, sourceTemplate: 'v26_1', loaderTemplate: 'forge/template', compileRelease: 25]
+].collect { spec ->
+    spec.projectPath = ":forge:${spec.moduleName}"
+    spec.forgeVersionRange = forgeMajorVersionRange(spec.forgeVersion)
+    spec
+}
+
+def shouldConfigureLoaderModule = { String projectPath, String rootPath ->
+    if (isDiagnosticOnlyRequest) {
+        return false
+    }
+    if (requestedTasks.isEmpty()) {
+        return true
+    }
+    if (requestedTasks.any { !it.contains(':') }) {
+        return true
+    }
+    if (requestedTasks.every { !it.startsWith("${rootPath}:") }) {
+        return false
+    }
+    def requestedProjectPaths = requestedTasks
+        .findAll { it.startsWith("${rootPath}:") }
+        .collect { it.split(':').take(3).join(':') }
+        .toSet()
+    requestedProjectPaths.isEmpty() || requestedProjectPaths.contains(projectPath)
+}
+
+String exactMinecraftVersionRange(String version) {
+    def parts = version.split('\\.')
+    assert parts.length >= 2 : "Unsupported Minecraft version: ${version}"
+    def upperBound = parts.length >= 3
+        ? ([parts[0], parts[1], Integer.toString(parts[2] as int + 1)]).join('.')
+        : "${parts[0]}.${parts[1] as int + 1}"
+    "[${version},${upperBound})"
+}
+
+String forgeMajorVersionRange(String forgeVersion) {
+    def loaderVersion = forgeVersion.substring(forgeVersion.indexOf('-') + 1)
+    def majorVersion = loaderVersion.substring(0, loaderVersion.indexOf('.'))
+    assert majorVersion.isInteger() : "Unsupported Forge version: ${forgeVersion}"
+    "[${majorVersion},)"
+}
+
+String mixinCompatibilityLevel(int javaVersion) {
+    "JAVA_${javaVersion}"
+}
+
+void configureJavaCompilerRelease(Project project, int javaVersion) {
+    project.extensions.configure(JavaPluginExtension) { JavaPluginExtension extension ->
+        extension.toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
+        extension.sourceCompatibility = JavaVersion.toVersion(javaVersion)
+        extension.targetCompatibility = JavaVersion.toVersion(javaVersion)
+        extension.withSourcesJar()
+    }
+    def toolchains = project.extensions.getByType(JavaToolchainService)
+    project.tasks.withType(JavaCompile).configureEach {
+        javaCompiler = toolchains.compilerFor {
+            languageVersion = JavaLanguageVersion.of(javaVersion)
+        }
+        options.encoding = 'UTF-8'
+        options.release = javaVersion
+    }
+}
+
+void addSharedMinecraftTemplate(Project project, String sourceTemplate, String loaderTemplate) {
+    def minecraftTemplateDir = rootProject.layout.projectDirectory.dir("minecraftCompat/${sourceTemplate}").asFile
+    def loaderTemplateDir = rootProject.layout.projectDirectory.dir(loaderTemplate).asFile
+    SourceSetContainer sourceSets = project.extensions.getByType(SourceSetContainer)
+    sourceSets.named('main') {
+            java.srcDir(new File(minecraftTemplateDir, 'src/main/java'))
+            resources.srcDir(new File(minecraftTemplateDir, 'src/main/resources'))
+            resources.srcDir(new File(loaderTemplateDir, 'src/main/resources'))
+    }
+    project.tasks.withType(JavaCompile).configureEach {
+        source(new File(loaderTemplateDir, 'src/main/java'))
+    }
+    project.tasks.withType(ProcessResources).configureEach {
+        exclude('fabric.mod.json')
+    }
+}
+
+void addBundledNeoLinkDependencies(Project project, String bundleConfigurationName, String commonCoordinate, String apiVersion) {
+    def bundle = project.configurations.create(bundleConfigurationName) {
+        canBeConsumed = false
+        canBeResolved = true
+        transitive = true
+        exclude group: 'com.github.oshi', module: 'oshi-core'
+        exclude group: 'net.java.dev.jna', module: 'jna'
+        exclude group: 'net.java.dev.jna', module: 'jna-platform'
+        exclude group: 'com.google.code.gson', module: 'gson'
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'com.google.guava', module: 'failureaccess'
+        exclude group: 'org.jline'
+        exclude group: 'org.slf4j'
+    }
+
+    project.dependencies {
+        implementation commonCoordinate
+        add(bundle.name, commonCoordinate)
+        add(bundle.name, "top.ceroxe.api:neolinkapi-desktop:${apiVersion}") {
+            transitive = false
+            exclude group: 'org.slf4j', module: 'slf4j-nop'
+            exclude group: 'com.google.code.gson', module: 'gson'
+        }
+    }
+
+    project.tasks.named('jar', Jar).configure {
+        dependsOn bundle
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        exclude(
+            'module-info.class',
+            'oshi/**',
+            'com/sun/jna/**',
+            'com/google/gson/**',
+            'com/google/common/**',
+            'com/google/errorprone/**',
+            'com/google/j2objc/**',
+            'org/checkerframework/**',
+            'org/jline/**',
+            'org/slf4j/**',
+            'META-INF/versions/**',
+            'META-INF/services/**',
+            'META-INF/native-image/**',
+            'META-INF/maven/**'
+        )
+        from(bundle.collect { dependency ->
+            dependency.directory ? dependency : project.zipTree(dependency)
+        })
+    }
+}
+
+void disableEmptyLoaderTests(Project project) {
+    project.tasks.withType(Test).configureEach {
+        enabled = false
+    }
+    project.tasks.withType(JavaCompile).configureEach {
+        if (name == 'compileTestJava') {
+            enabled = false
+        }
+    }
+}
+
+void configureForgeModule(Project project, Map spec, String commonCoordinate, String apiVersion, String annotationsVersion) {
+    project.apply plugin: 'java'
+    project.apply plugin: 'net.minecraftforge.gradle'
+    project.apply plugin: 'maven-publish'
+
+    project.version = rootProject.version
+
+    configureJavaCompilerRelease(project, spec.javaVersion as int)
+    project.tasks.withType(JavaCompile).configureEach {
+        options.release = spec.compileRelease as int
+    }
+    project.configurations.configureEach {
+        if (canBeResolved) {
+            attributes.attribute(org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, spec.javaVersion as int)
+        }
+    }
+
+    project.repositories {
+        def commonRepoPath = rootProject.providers.gradleProperty('neolinkmc_common_repo').orNull
+        if (commonRepoPath) {
+            maven {
+                url = uri(commonRepoPath)
+                content {
+                    includeGroup 'top.ceroxe.neolinkmc'
+                }
+            }
+        }
+        if (project.providers.gradleProperty('useMavenLocal').map { it.toBoolean() }.orElse(false).get()) {
+            mavenLocal()
+        }
+        project.minecraft.mavenizer(it)
+        maven project.fg.forgeMaven
+        maven project.fg.minecraftLibsMaven
+        mavenCentral()
+    }
+
+    addSharedMinecraftTemplate(project, spec.sourceTemplate as String, spec.loaderTemplate as String)
+    addBundledNeoLinkDependencies(project, 'forgeBundle', commonCoordinate, apiVersion)
+    disableEmptyLoaderTests(project)
+
+    def archivesBaseName = rootProject.property('archives_base_name').toString()
+    project.base {
+        archivesName = "${archivesBaseName}-Forge-${spec.minecraftVersion}"
+    }
+
+    project.minecraft {
+        if (!(spec.minecraftVersion as String).startsWith('26.')) {
+            mappings channel: 'official', version: spec.minecraftVersion
+        }
+    }
+
+    project.dependencies {
+        implementation project.minecraft.dependency("net.minecraftforge:forge:${spec.forgeVersion}")
+        compileOnly "org.jetbrains:annotations:${annotationsVersion}"
+    }
+
+    def resourceProperties = [
+        version                  : project.version.toString(),
+        minecraft_version        : spec.minecraftVersion,
+        minecraft_version_range  : exactMinecraftVersionRange(spec.minecraftVersion as String),
+        loader_version_range     : "[${(spec.forgeVersion as String).split('-')[1].split('\\.')[0]},)",
+        forge_version_range      : spec.forgeVersionRange,
+        mixin_compatibility_level: mixinCompatibilityLevel(spec.compileRelease as int)
+    ]
+
+    project.tasks.named('processResources', ProcessResources).configure {
+        inputs.properties(resourceProperties)
+        filesMatching(['META-INF/mods.toml', 'neolinkmc.mixins.json']) {
+            expand(resourceProperties)
+        }
+    }
+
+    project.tasks.named('jar', Jar).configure {
+        from(rootProject.file('LICENSE')) {
+            rename { "${it}_${archivesBaseName}" }
+        }
+        manifest.attributes('MixinConfigs': 'neolinkmc.mixins.json')
+    }
+}
+
+project(':forge') {
+    apply plugin: 'base'
+}
+
+forgeModules.each { spec ->
+    def target = findProject(spec.projectPath)
+    if (target && shouldConfigureLoaderModule(target.path, ':forge')) {
+        configureForgeModule(target, spec, neoLinkMcCommonCoordinate, neoLinkApiVersion, jetbrainsAnnotationsVersion)
+    }
+}

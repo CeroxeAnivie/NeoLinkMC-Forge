@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "neoproxy.neolinkmc.mixin",
+  "compatibilityLevel": "${mixin_compatibility_level}",
+  "mixins": [
+    "MixinUUIDUtil"
+  ],
+  "client": [
+    "MixinOpenToLanScreen",
+    "MixinScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

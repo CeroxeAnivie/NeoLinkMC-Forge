@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="MIT"
+
+[[mods]]
+modId="neolinkmc"
+version="${version}"
+displayName="NeoLinkMC"
+description='''NeoLinkMC opens integrated Minecraft worlds through NeoLink.'''
+authors="NeoProxy Team"
+logoFile="assets/neolinkmc/icon.png"
+
+[[mixins]]
+config="neolinkmc.mixins.json"
+
+[[dependencies.neolinkmc]]
+modId="forge"
+mandatory=true
+versionRange="${forge_version_range}"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.neolinkmc]]
+modId="minecraft"
+mandatory=true
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
