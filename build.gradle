@@ -96,16 +96,11 @@ String mixinCompatibilityLevel(int javaVersion) {
 
 void configureJavaCompilerRelease(Project project, int javaVersion) {
     project.extensions.configure(JavaPluginExtension) { JavaPluginExtension extension ->
-        extension.toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
         extension.sourceCompatibility = JavaVersion.toVersion(javaVersion)
         extension.targetCompatibility = JavaVersion.toVersion(javaVersion)
         extension.withSourcesJar()
     }
-    def toolchains = project.extensions.getByType(JavaToolchainService)
     project.tasks.withType(JavaCompile).configureEach {
-        javaCompiler = toolchains.compilerFor {
-            languageVersion = JavaLanguageVersion.of(javaVersion)
-        }
         options.encoding = 'UTF-8'
         options.release = javaVersion
     }
@@ -154,7 +149,6 @@ void addBundledNeoLinkDependencies(Project project, String bundleConfigurationNa
     }
 
     project.tasks.named('jar', Jar).configure {
-        dependsOn bundle
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         exclude(
             'module-info.class',
@@ -172,8 +166,10 @@ void addBundledNeoLinkDependencies(Project project, String bundleConfigurationNa
             'META-INF/native-image/**',
             'META-INF/maven/**'
         )
-        from(bundle.collect { dependency ->
-            dependency.directory ? dependency : project.zipTree(dependency)
+        from({
+            bundle.collect { dependency ->
+                dependency.directory ? dependency : project.zipTree(dependency)
+            }
         })
     }
 }
