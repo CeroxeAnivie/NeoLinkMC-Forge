@@ -16,8 +16,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class MinecraftMessageHandler implements MessageHandler {
 
-    private static final String PREFIX = "[NLMC] ";
-    private static final String CHAT_PREFIX = "§b";
+    private static final String PREFIX = "[内网穿透] ";
 
     @Override
     public void send(@NotNull String message, @NotNull MessageType type) {
@@ -34,8 +33,8 @@ public final class MinecraftMessageHandler implements MessageHandler {
     @Override
     public void log(@NotNull String message, @NotNull LogLevel level) {
         switch (level) {
-            case DEBUG -> NeoLinkMC.LOGGER.debug("[DEBUG] {}", message);
-            case INFO -> NeoLinkMC.LOGGER.info("[NeoLink] {}", message);
+            case DEBUG -> NeoLinkMC.LOGGER.debug("[调试] {}", message);
+            case INFO -> NeoLinkMC.LOGGER.info("[内网穿透] {}", message);
             case WARN -> NeoLinkMC.LOGGER.warn(message);
             case ERROR -> NeoLinkMC.LOGGER.error(message);
         }
@@ -44,8 +43,8 @@ public final class MinecraftMessageHandler implements MessageHandler {
     @Override
     public void log(@NotNull String message, @NotNull LogLevel level, @NotNull Throwable throwable) {
         switch (level) {
-            case DEBUG -> NeoLinkMC.LOGGER.debug("[DEBUG] {}", message, throwable);
-            case INFO -> NeoLinkMC.LOGGER.info("[NeoLink] {}", message, throwable);
+            case DEBUG -> NeoLinkMC.LOGGER.debug("[调试] {}", message, throwable);
+            case INFO -> NeoLinkMC.LOGGER.info("[内网穿透] {}", message, throwable);
             case WARN -> NeoLinkMC.LOGGER.warn(message, throwable);
             case ERROR -> NeoLinkMC.LOGGER.error(message, throwable);
         }
@@ -66,7 +65,7 @@ public final class MinecraftMessageHandler implements MessageHandler {
                 });
             }
         } catch (Exception e) {
-            NeoLinkMC.LOGGER.debug("Failed to send chat message.", e);
+            NeoLinkMC.LOGGER.debug("发送聊天消息失败。", e);
         }
     }
 }

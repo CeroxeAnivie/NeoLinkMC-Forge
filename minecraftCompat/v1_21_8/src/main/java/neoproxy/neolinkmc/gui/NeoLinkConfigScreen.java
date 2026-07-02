@@ -320,7 +320,7 @@ public class NeoLinkConfigScreen extends Screen {
         // 保存共享配置；key 只用于本次连接，绝不持久化。
         saveConfig();
 
-        // 2. 获取密钥（从高级设置界面传入的密钥，空字符串则使用 "Free"）
+        // 2. 获取密钥（从高级设置界面传入的密钥，空字符串则使用默认密钥）
         String key = ConnectionConfig.normalizeKey(this.config.key);
 
         // 3. 根据配置的端口建议值开启 LAN

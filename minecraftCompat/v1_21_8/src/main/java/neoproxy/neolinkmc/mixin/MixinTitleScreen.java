@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Watches for a return to the title screen and shuts down any leftover tunnel state.
+ * 监听返回标题界面事件，并关闭残留的内网穿透状态。
  *
  * <p>This keeps the cleanup hook narrowly scoped to the title screen instead of intercepting
  * every screen close event, which avoids swallowing unrelated UI interactions.</p>

@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * NeoLink 高级设置界面
+ * 内网穿透高级设置界面
  * <p>
  * 提供内网穿透高级配置选项：
  * - 远程服务器地址

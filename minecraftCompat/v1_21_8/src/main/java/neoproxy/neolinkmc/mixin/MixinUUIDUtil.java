@@ -29,14 +29,14 @@ public abstract class MixinUUIDUtil {
      */
     @Inject(method = "createOfflinePlayerUUID(Ljava/lang/String;)Ljava/util/UUID;", at = @At("HEAD"), cancellable = true)
     private static void neolinkmc$onCreateOfflinePlayerUUID(String playerName, CallbackInfoReturnable<UUID> ci) {
-        NeoLinkMC.LOGGER.debug("[DEBUG] MixinUUIDUtil.onCreateOfflinePlayerUUID() 注入点触发，玩家: {}", playerName);
+        NeoLinkMC.LOGGER.debug("[调试] 玩家编号修复注入点触发，玩家：{}", playerName);
         UUID uuid = UUIDFixer.hookEntry(playerName);
         if (uuid != null) {
-            NeoLinkMC.LOGGER.debug("[DEBUG] UUID修复成功，玩家: {} -> UUID: {}", playerName, uuid);
+            NeoLinkMC.LOGGER.debug("[调试] 玩家编号修复成功，玩家：{} -> {}", playerName, uuid);
             ci.setReturnValue(uuid);
             ci.cancel();
         } else {
-            NeoLinkMC.LOGGER.debug("[DEBUG] UUID修复未生效，使用默认离线UUID生成，玩家: {}", playerName);
+            NeoLinkMC.LOGGER.debug("[调试] 玩家编号修复未生效，使用默认离线玩家编号生成，玩家：{}", playerName);
         }
     }
 }
