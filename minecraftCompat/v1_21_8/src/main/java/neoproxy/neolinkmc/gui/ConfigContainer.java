@@ -95,7 +95,7 @@ public final class ConfigContainer {
         applyAllowCheats(server.getPlayerList(), this.allowCheats);
         server.setUsesAuthentication(this.onlineMode.onlineModeEnabled);
         applyPvpAllowed(server, this.pvpAllowed);
-        UUIDFixer.tryOnlineFirst = this.onlineMode.tryOnlineUUIDFirst;
+        UUIDFixer.setTryOnlineFirst(this.onlineMode.tryOnlineUUIDFirst);
     }
 
     private static void applyAllowCheats(PlayerList playerList, boolean allowCheats) {

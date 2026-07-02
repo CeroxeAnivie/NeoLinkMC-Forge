@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
  * 2. 向 NeoLinkMC 日志系统记录日志
  *
  * @author NeoProxy Team
- * @version 0.3.1
  */
 public final class MinecraftMessageHandler implements MessageHandler {
 

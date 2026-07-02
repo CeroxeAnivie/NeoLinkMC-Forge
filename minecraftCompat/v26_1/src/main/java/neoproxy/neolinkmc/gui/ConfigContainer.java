@@ -96,7 +96,7 @@ public final class ConfigContainer {
         server.setUsesAuthentication(this.onlineMode.onlineModeEnabled);
         // 26.1 使用 GameRules 设置 PvP
         server.getGameRules().set(GameRules.PVP, this.pvpAllowed, server);
-        UUIDFixer.tryOnlineFirst = this.onlineMode.tryOnlineUUIDFirst;
+        UUIDFixer.setTryOnlineFirst(this.onlineMode.tryOnlineUUIDFirst);
     }
 
     private static void applyAllowCheats(PlayerList playerList, boolean allowCheats) {

@@ -31,7 +31,6 @@ import java.util.function.Predicate;
  * - 底部：端口输入框 + 最大玩家数输入框 + 操作按钮
  *
  * @author NeoProxy Team
- * @version 0.3.1
  */
 public class NeoLinkConfigScreen extends Screen {
 

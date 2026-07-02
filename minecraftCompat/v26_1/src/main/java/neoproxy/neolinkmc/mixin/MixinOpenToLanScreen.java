@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Replaces the 26.1 LAN screen with the NeoLink configuration screen.
  *
  * @author NeoProxy Team
- * @version 0.3.1
  */
 @Mixin(targets = "net.minecraft.client.gui.screens.ShareToLanScreen")
 public abstract class MixinOpenToLanScreen extends Screen {

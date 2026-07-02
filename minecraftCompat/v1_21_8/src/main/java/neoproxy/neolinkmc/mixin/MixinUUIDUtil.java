@@ -16,7 +16,6 @@ import java.util.UUID;
  * 与 LanServerProperties 保持一致
  *
  * @author NeoProxy Team
- * @version 0.3.1
  */
 @Mixin(UUIDUtil.class)
 public abstract class MixinUUIDUtil {

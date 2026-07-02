@@ -8,7 +8,9 @@ group = property('maven_group')
 version = property('mod_version')
 
 def neoLinkApiVersion = property('neolinkapi_version')
-def neoLinkMcCommonVersion = property('neolinkmc_common_version')
+def neoLinkMcCommonVersion = providers.gradleProperty('neolinkmc_common_version')
+    .orElse(providers.gradleProperty('mod_version'))
+    .get()
 def neoLinkMcCommonCoordinate = "top.ceroxe.neolinkmc:neolinkmc-common:${neoLinkMcCommonVersion}"
 def jetbrainsAnnotationsVersion = '26.0.2'
 def requestedTasks = gradle.startParameter.taskNames
@@ -25,6 +27,15 @@ def diagnosticRootTasks = [
 ] as Set
 def isDiagnosticOnlyRequest = !requestedTasks.isEmpty() && requestedTasks.every { taskName ->
     !taskName.contains(':') && diagnosticRootTasks.contains(taskName)
+}
+def representativeForgeModules = ['v1_21_5', 'v26_1_2']
+def lightweightRootTasks = [
+    'verifyRepresentativeForge',
+    'verifyRepresentativeForge21',
+    'verifyRepresentativeForge26'
+] as Set
+def isRepresentativeOnlyRequest = !requestedTasks.isEmpty() && requestedTasks.every { taskName ->
+    !taskName.contains(':') && lightweightRootTasks.contains(taskName)
 }
 
 def forgeModules = [
@@ -60,6 +71,9 @@ def shouldConfigureLoaderModule = { String projectPath, String rootPath ->
     }
     if (requestedTasks.isEmpty()) {
         return true
+    }
+    if (isRepresentativeOnlyRequest) {
+        return representativeForgeModules.any { moduleName -> projectPath == "${rootPath}:${moduleName}" }
     }
     if (requestedTasks.any { !it.contains(':') }) {
         return true
@@ -267,6 +281,24 @@ void configureForgeModule(Project project, Map spec, String commonCoordinate, St
 
 project(':forge') {
     apply plugin: 'base'
+}
+
+tasks.register('verifyRepresentativeForge21') {
+    group = 'verification'
+    description = 'Builds the default Forge 1.21.5 representative module used for cold-start validation.'
+    dependsOn ':forge:v1_21_5:jar'
+}
+
+tasks.register('verifyRepresentativeForge26') {
+    group = 'verification'
+    description = 'Builds the default Forge 26.1.2 representative module used for cold-start validation.'
+    dependsOn ':forge:v26_1_2:jar'
+}
+
+tasks.register('verifyRepresentativeForge') {
+    group = 'verification'
+    description = 'Builds the default Forge representative modules used for cold-start validation.'
+    dependsOn representativeForgeModules.collect { ":forge:${it}:jar" }
 }
 
 forgeModules.each { spec ->

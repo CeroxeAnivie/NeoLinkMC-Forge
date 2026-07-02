@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * This avoids startup-time Mixin fragility when production mappings or refmaps change.</p>
  *
  * @author NeoProxy Team
- * @version 0.3.1
  */
 @Mixin(ShareToLanScreen.class)
 public abstract class MixinOpenToLanScreen extends Screen {

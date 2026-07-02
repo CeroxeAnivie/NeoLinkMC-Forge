@@ -18,11 +18,11 @@ modId="forge"
 mandatory=true
 versionRange="${forge_version_range}"
 ordering="NONE"
-side="BOTH"
+side="CLIENT"
 
 [[dependencies.neolinkmc]]
 modId="minecraft"
 mandatory=true
 versionRange="${minecraft_version_range}"
 ordering="NONE"
-side="BOTH"
+side="CLIENT"
